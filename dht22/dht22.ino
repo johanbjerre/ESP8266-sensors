@@ -13,81 +13,133 @@
 #define DHTPIN 5
 #define LED D4
 
-const char* ssid = "asd";
-const char* password = "asd";
-const char *area = "livingroom";
+const char *SSID = "asd";
+const char *PASSWORD = "asd";
+const char *AREA = "livingroom";
+const char *URL_WS = "http://url";
+const char *UNITNAME_DHT22 = "dht22";
+const char *UNITNAME_DS18B20 = "ds18b20";
+const int DELAY_TIME = 300000; //1000*60*5=300000 (5 min)
+const bool SAVE_HUMIDITY = true;
+const bool SAVE_TEMPERATURE = true;
+const bool DEBUG_MODE = false;
 
 #define DHTTYPE DHT22
 
 DHT dht(DHTPIN, DHTTYPE);
 
-void setup() {
+void setup()
+{
   //LED set as output
   pinMode(LED, OUTPUT);
 
   //TURN OFF LED
   digitalWrite(LED, HIGH);
 
-  Serial.begin(9600);
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
+  if (DEBUG_MODE)
+  {
+    Serial.begin(9600);
+    Serial.println();
+    Serial.print("Connecting to ");
+    Serial.println(SSID);
+  }
 
-  WiFi.begin(ssid, password);
+  WiFi.begin(SSID, PASSWORD);
   WiFi.mode(WIFI_STA);
 
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(10000);
-    Serial.print(".");
+    if (DEBUG_MODE)
+    {
+      Serial.print(".");
+    }
   }
-  Serial.println("");
-  Serial.println("WiFi connected");
+  if (DEBUG_MODE)
+  {
+    Serial.println("");
+    Serial.println("WiFi connected");
+  }
 
   dht.begin();
 }
 
-void loop() {
+void loop()
+{
 
   //TURN ON LED
   digitalWrite(LED, LOW);
 
-  float h = dht.readHumidity();
-  float t = dht.readTemperature();
+  if (SAVE_HUMIDITY)
+  {
+    float m = dht.readHumidity();
+    if (isnan(m))
+    {
+      if (DEBUG_MODE)
+      {
+        Serial.println(F("Failed to read sensor"));
+      }
 
-  if (isnan(h) || isnan(t)) {
-    Serial.println(F("Failed to read sensor"));
+      //TURN OFF LED
+      digitalWrite(LED, HIGH);
+      return;
+    }
 
-    //TURN OFF LED
-    digitalWrite(LED, HIGH);
-    return;
+    if (DEBUG_MODE)
+    {
+      Serial.print(F("Humidity: "));
+      Serial.print(m);
+    }
+
+    postData(String(UNITNAME_DHT22), String(m));
   }
 
-  Serial.print(F("Humidity: "));
-  Serial.print(h);
-  Serial.print(F("%  Temperature: "));
-  Serial.print(t);
-  Serial.print(F("°C "));
+  if (SAVE_TEMPERATURE)
+  {
+    float m = dht.readTemperature();
+    if (isnan(m))
+    {
+      if (DEBUG_MODE)
+      {
+        Serial.println(F("Failed to read sensor"));
+      }
 
-  String hString = String(h);
-  String tString = String(t);
-  postData(hString, tString);
+      //TURN OFF LED
+      digitalWrite(LED, HIGH);
+      return;
+    }
+
+    if (DEBUG_MODE)
+    {
+      Serial.print(F("%  Temperature: "));
+      Serial.print(m);
+      Serial.print(F("°C "));
+    }
+
+    //TODO fix string
+    postData(String(UNITNAME_DS18B20), String(m));
+  }
 
   //TURN OFF LED
   digitalWrite(LED, HIGH);
 
-    delay(300000); //1000*60*5=300000 (5 min)
+  delay(DELAY_TIME);
 }
 
-void postData(String humidity, String temperature) {
+void postData(String unitname, String measurement)
+{
   HTTPClient http;
-  http.begin("http://url");
+  http.begin(String(URL_WS));
   http.addHeader("Content-Type", "application/json");
 
-  int httpCode1 = http.POST("[{'Unitname':'dht22','Description':'"+String(area)+"','Value':'" + humidity + "'}]");
+  int httpCode1 = http.POST("[{'Unitname':'" + unitname + "','Description':'" + String(AREA) + "','Value':'" + measurement + "'}]");
   String payload1 = http.getString();
 
-  Serial.println(httpCode1);
-  Serial.println(payload1);
+  if (DEBUG_MODE)
+  {
+    Serial.println(httpCode1);
+    Serial.println(payload1);
+  }
 
   http.end();
 }
