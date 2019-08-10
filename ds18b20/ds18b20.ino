@@ -10,9 +10,9 @@ OneWire oneWire(oneWireBus);
 
 DallasTemperature sensors(&oneWire);
 
-const char *ssid = "";
-const char *password = "";
-const char *area = "outside";
+const char *ssid = "asd";
+const char *password = "asd";
+const char *area = "livingroom";
 
 #define LED D4
 void setup()
@@ -29,6 +29,7 @@ void setup()
   Serial.println(ssid);
 
   WiFi.begin(ssid, password);
+  WiFi.mode(WIFI_STA);
 
   while (WiFi.status() != WL_CONNECTED)
   {

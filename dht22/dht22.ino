@@ -13,8 +13,9 @@
 #define DHTPIN 5
 #define LED D4
 
-const char* ssid = "your ssid";
-const char* password = "your password";
+const char* ssid = "asd";
+const char* password = "asd";
+const char *area = "livingroom";
 
 #define DHTTYPE DHT22
 
@@ -33,6 +34,7 @@ void setup() {
   Serial.println(ssid);
 
   WiFi.begin(ssid, password);
+  WiFi.mode(WIFI_STA);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(10000);
@@ -45,7 +47,6 @@ void setup() {
 }
 
 void loop() {
-  delay(300000); //1000*60*5=300000 (5 min)
 
   //TURN ON LED
   digitalWrite(LED, LOW);
@@ -73,6 +74,8 @@ void loop() {
 
   //TURN OFF LED
   digitalWrite(LED, HIGH);
+
+    delay(300000); //1000*60*5=300000 (5 min)
 }
 
 void postData(String humidity, String temperature) {
@@ -80,7 +83,7 @@ void postData(String humidity, String temperature) {
   http.begin("http://url");
   http.addHeader("Content-Type", "application/json");
 
-  int httpCode1 = http.POST("[{'Unitname':'dht22','Description':'hall','Value':'" + humidity + "'}]");
+  int httpCode1 = http.POST("[{'Unitname':'dht22','Description':'"+String(area)+"','Value':'" + humidity + "'}]");
   String payload1 = http.getString();
 
   Serial.println(httpCode1);
