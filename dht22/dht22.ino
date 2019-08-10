@@ -72,58 +72,68 @@ void loop()
 
   if (SAVE_HUMIDITY)
   {
-    float m = dht.readHumidity();
-    if (isnan(m))
-    {
-      if (DEBUG_MODE)
-      {
-        Serial.println(F("Failed to read sensor"));
-      }
-
-      //TURN OFF LED
-      digitalWrite(LED, HIGH);
-      return;
-    }
-
-    if (DEBUG_MODE)
-    {
-      Serial.print(F("Humidity: "));
-      Serial.print(m);
-    }
-
-    postData(String(UNITNAME_DHT22), String(m));
+    saveHumidity();
   }
 
   if (SAVE_TEMPERATURE)
   {
-    float m = dht.readTemperature();
-    if (isnan(m))
-    {
-      if (DEBUG_MODE)
-      {
-        Serial.println(F("Failed to read sensor"));
-      }
-
-      //TURN OFF LED
-      digitalWrite(LED, HIGH);
-      return;
-    }
-
-    if (DEBUG_MODE)
-    {
-      Serial.print(F("%  Temperature: "));
-      Serial.print(m);
-      Serial.print(F("°C "));
-    }
-
-    //TODO fix string
-    postData(String(UNITNAME_DS18B20), String(m));
+    saveTemperature();
   }
 
   //TURN OFF LED
   digitalWrite(LED, HIGH);
 
   delay(DELAY_TIME);
+}
+
+void saveHumidity()
+{
+  float m = dht.readHumidity();
+  if (isnan(m))
+  {
+    if (DEBUG_MODE)
+    {
+      Serial.println(F("Failed to read sensor"));
+    }
+
+    //TURN OFF LED
+    digitalWrite(LED, HIGH);
+    return;
+  }
+
+  if (DEBUG_MODE)
+  {
+    Serial.print(F("Humidity: "));
+    Serial.print(m);
+  }
+
+  postData(String(UNITNAME_DHT22), String(m));
+}
+
+void saveTemperature()
+{
+  float m = dht.readTemperature();
+  if (isnan(m))
+  {
+    if (DEBUG_MODE)
+    {
+      Serial.println(F("Failed to read sensor"));
+    }
+
+    //TURN OFF LED
+    digitalWrite(LED, HIGH);
+    return;
+  }
+
+  if (DEBUG_MODE)
+  {
+    Serial.print(F("%  Temperature: "));
+    Serial.print(m);
+    Serial.print(F("°C "));
+  }
+
+  //TODO fix string
+  postData(String(UNITNAME_DS18B20), String(m));
 }
 
 void postData(String unitname, String measurement)
