@@ -10,9 +10,10 @@ OneWire oneWire(oneWireBus);
 
 DallasTemperature sensors(&oneWire);
 
-const char *ssid = "asd";
-const char *password = "asd";
-const char *area = "livingroom";
+const char *SSID = "WIRELESS DETONATOR";
+const char *PASSWORD = "1ballapa";
+const char *URL_WS = "http://81.4.102.148:81/api/Weather/saveNow";
+const char *AREA = "livingroom";
 
 #define LED D4
 void setup()
@@ -26,9 +27,9 @@ void setup()
   Serial.begin(9600);
   Serial.println();
   Serial.print("Connecting to ");
-  Serial.println(ssid);
+  Serial.println(SSID);
 
-  WiFi.begin(ssid, password);
+  WiFi.begin(SSID, PASSWORD);
   WiFi.mode(WIFI_STA);
 
   while (WiFi.status() != WL_CONNECTED)
@@ -63,10 +64,10 @@ void loop()
 void postData(String temperature)
 {
   HTTPClient http;
-  http.begin("http://url");
+  http.begin(String(URL_WS));
   http.addHeader("Content-Type", "application/json");
 
-  int httpCode1 = http.POST("[{'Unitname':'ds18b20','Description':'" + String(area) + "','Value':'" + temperature + "'}]");
+  int httpCode1 = http.POST("[{'Unitname':'ds18b20','Description':'" + String(AREA) + "','Value':'" + temperature + "'}]");
   String payload1 = http.getString();
 
   Serial.println(httpCode1);
