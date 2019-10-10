@@ -1,22 +1,18 @@
 
-#include <OneWire.h>
-#include <DallasTemperature.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 
-const int oneWireBus = 4;
-
-OneWire oneWire(oneWireBus);
-
-DallasTemperature sensors(&oneWire);
-
 const char *AREA = "livingroom";
+const char *UNITNAME = "pir";
 
 #define LED D4
+#define SENSOR D7
+
 void setup()
 {
-  //LED set as output
+  //LED set as output and SENSOR as input
   pinMode(LED, OUTPUT);
+  pinMode(SENSOR, INPUT);
 
   //TURN OFF LED
   digitalWrite(LED, HIGH);
@@ -36,35 +32,37 @@ void setup()
   }
   Serial.println("");
   Serial.println("WiFi connected");
-
-  sensors.begin();
 }
 
 void loop()
 {
+  Serial.println("Looking");
 
-  //TURN ON LED
-  digitalWrite(LED, LOW);
-
-  sensors.requestTemperatures();
-  float temperatureC = sensors.getTempCByIndex(0);
-  Serial.print(temperatureC);
-  Serial.println("ºC");
-
-  postData(String(temperatureC));
-  //TURN OFF LED
-  digitalWrite(LED, HIGH);
-
-  delay(300000); //1000*60*5=300000 (5 min)
+  long state = digitalRead(SENSOR);
+  if (state == HIGH)
+  {
+    //TURN ON LED
+    digitalWrite(LED, LOW);
+    Serial.println("MOVEMENT DETECTED");
+    //SAVE DATA
+    postData();
+    delay(10000);
+  }
+  else
+  {
+    digitalWrite(LED, HIGH);
+    Serial.println("NO MOVEMENT DETECTED");
+    delay(100);
+  }
 }
 
-void postData(String temperature)
+void postData()
 {
   HTTPClient http;
   http.begin(String(URL_WS));
   http.addHeader("Content-Type", "application/json");
 
-  int httpCode1 = http.POST("[{'Unitname':'ds18b20','Description':'" + String(AREA) + "','Value':'" + temperature + "'}]");
+  int httpCode1 = http.POST("[{'Unitname':'" + String(UNITNAME) + "','Description':'" + String(AREA) + "','Value':'0'}]");
   String payload1 = http.getString();
 
   Serial.println(httpCode1);

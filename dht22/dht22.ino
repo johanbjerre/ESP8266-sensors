@@ -13,10 +13,7 @@
 #define DHTPIN 5
 #define LED D4
 
-const char *SSID = "asd";
-const char *PASSWORD = "asd";
-const char *AREA = "livingroom";
-const char *URL_WS = "http://url";
+const char *AREA = "laundryroom";
 const char *UNITNAME_DHT22 = "dht22";
 const char *UNITNAME_DS18B20 = "ds18b20";
 const int DELAY_TIME = 300000; //1000*60*5=300000 (5 min)
