@@ -10,9 +10,6 @@ OneWire oneWire(oneWireBus);
 
 DallasTemperature sensors(&oneWire);
 
-const char *SSID = "WIRELESS DETONATOR";
-const char *PASSWORD = "1ballapa";
-const char *URL_WS = "http://81.4.102.148:81/api/Weather/saveNow";
 const char *AREA = "livingroom";
 
 #define LED D4

@@ -32,7 +32,6 @@ void setup()
   }
   Serial.println("");
   Serial.println("WiFi connected");
-
 }
 
 void loop()
@@ -40,7 +39,8 @@ void loop()
   Serial.println("Looking");
 
   long state = digitalRead(SENSOR);
-  if(state == HIGH) {
+  if (state == HIGH)
+  {
     //TURN ON LED
     digitalWrite(LED, LOW);
     Serial.println("MOVEMENT DETECTED");
@@ -48,12 +48,12 @@ void loop()
     postData();
     delay(10000);
   }
-    else {
-      digitalWrite (LED, HIGH);
-      Serial.println("NO MOVEMENT DETECTED");
-      delay(100);
-      }
-
+  else
+  {
+    digitalWrite(LED, HIGH);
+    Serial.println("NO MOVEMENT DETECTED");
+    delay(100);
+  }
 }
 
 void postData()
@@ -62,7 +62,7 @@ void postData()
   http.begin(String(URL_WS));
   http.addHeader("Content-Type", "application/json");
 
-  int httpCode1 = http.POST("[{'Unitname':'"+String(UNITNAME)+"','Description':'" + String(AREA) + "','Value':'0'}]");
+  int httpCode1 = http.POST("[{'Unitname':'" + String(UNITNAME) + "','Description':'" + String(AREA) + "','Value':'0'}]");
   String payload1 = http.getString();
 
   Serial.println(httpCode1);
