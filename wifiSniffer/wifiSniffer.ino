@@ -2,30 +2,40 @@
 #include "./functions.h"
 
 #define disable 0
-#define enable  1
+#define enable 1
 unsigned int channel = 1;
 
-void setup() {
+void setup()
+{
   Serial.begin(57600);
 
-  wifi_set_opmode(STATION_MODE);            // Promiscuous works only with station mode
+  //Promiscuous works only with station mode
+  wifi_set_opmode(STATION_MODE);
   wifi_set_channel(channel);
   wifi_promiscuous_enable(disable);
-  wifi_set_promiscuous_rx_cb(promisc_cb);   // Set up promiscuous callback
+  //Set up promiscuous callback
+  wifi_set_promiscuous_rx_cb(promisc_cb);
   wifi_promiscuous_enable(enable);
 }
 
-void loop() {
+void loop()
+{
   channel = 1;
   wifi_set_channel(channel);
-  while (true) {
-    nothing_new++;                          // Array is not finite, check bounds and adjust if required
-    if (nothing_new > 100) {
+  while (true)
+  {
+    //Array is not finite, check bounds and adjust if required
+    nothing_new++;
+    if (nothing_new > 100)
+    {
       nothing_new = 0;
       channel++;
-      if (channel == 15) break;             // Only scan channels 1 to 14
+      //Only scan channels 1 to 14
+      if (channel == 15)
+        break;
       wifi_set_channel(channel);
     }
-    delay(1);  // critical processing timeslice for NONOS SDK! No delay(0) yield()
+    //critical processing timeslice for NONOS SDK! No delay(0) yield()
+    delay(1);
   }
 }
