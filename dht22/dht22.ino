@@ -13,13 +13,17 @@
 #define DHTPIN 5
 #define LED D4
 
-const char *AREA = "laundryroom";
+const char *AREA = "garage";
 const char *UNITNAME_DHT22 = "dht22";
 const char *UNITNAME_DS18B20 = "ds18b20";
 const int DELAY_TIME = 300000; //1000*60*5=300000 (5 min)
 const bool SAVE_HUMIDITY = true;
 const bool SAVE_TEMPERATURE = true;
 const bool DEBUG_MODE = false;
+
+const char *SSID = "";
+const char *PASSWORD = "";
+const char *URL_WS = "";
 
 #define DHTTYPE DHT22
 
