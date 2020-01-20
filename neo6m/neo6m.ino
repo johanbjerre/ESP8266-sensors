@@ -1,15 +1,22 @@
 #include <TinyGPS++.h> // library for GPS module
 #include <SoftwareSerial.h>
 #include <ESP8266WiFi.h>
-TinyGPSPlus gps;                         // The TinyGPS++ object
-SoftwareSerial ss(4, 5);                 // The serial connection to the GPS device
-const char *ssid = ""; //ssid of your wifi
-const char *password = "";       //password of your wifi
+#include <ESP8266HTTPClient.h>
+TinyGPSPlus gps;
+SoftwareSerial ss(4, 5);// The serial connection to the GPS device
 float latitude, longitude;
 int year, month, date, hour, minute, second;
-String date_str, time_str, lat_str, lng_str;
+String date_str, time_str, lat_str, lng_str, coords;
 int pm;
-WiFiServer server(80);
+
+const char *AREA = "car";
+const int DELAY_TIME = 1000*10;
+const bool DEBUG_MODE = true;
+const char *UNITNAME = "gps";
+
+const char *SSID = "";
+const char *PASSWORD = "";
+const char *URL_WS = "";
 
 void setup()
 {
@@ -17,8 +24,8 @@ void setup()
   ss.begin(9600);
   Serial.println();
   Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);           //connecting to wifi
+  Serial.println(SSID);
+  WiFi.begin(SSID, PASSWORD);           //connecting to wifi
   while (WiFi.status() != WL_CONNECTED) // while wifi not connected
   {
     delay(500);
@@ -26,9 +33,6 @@ void setup()
   }
   Serial.println("");
   Serial.println("WiFi connected");
-  server.begin();
-  Serial.println("Server started");
-  Serial.println(WiFi.localIP()); // Print the IP address
 }
 
 void loop()
@@ -42,7 +46,6 @@ void loop()
         lat_str = String(latitude, 6); // latitude location is stored in a string
         longitude = gps.location.lng();
         lng_str = String(longitude, 6); //longitude location is stored in a string
-        Serial.println("lat_str:"+lat_str);
       }
       if (gps.date.isValid()) //check whether gps date is valid
       {
@@ -62,10 +65,6 @@ void loop()
         if (year < 10)
           date_str += '0';
         date_str += String(year); // values of date,month and year are stored in a string
-        Serial.println("date_str:"+date_str);
-      }
-      if(gps.satellites.isValid()){
-        Serial.println("gps.satellites:"+String(gps.satellites.value()));
       }
       if (gps.time.isValid()) //check whether gps time is valid
       {
@@ -102,39 +101,45 @@ void loop()
           time_str += " PM ";
         else
           time_str += " AM ";
-          Serial.println("time_str:"+time_str);
+      }
+      if (gps.location.isValid() && gps.date.isValid() && gps.satellites.isValid() && gps.time.isValid())
+      {
+        //location
+        Serial.print("lat_str:" + lat_str+", lng_str:" + lng_str);
+
+        coords=lng_str + "," +lat_str;
+        postData(String(UNITNAME),coords);
+
+        //date
+        Serial.print(", date_str:" + date_str);
+        
+        //location
+        Serial.print(", gps.satellites:" + String(gps.satellites.value()));
+
+        //time
+        Serial.print(", time_str:" + time_str);
+        Serial.println("");
+        delay(DELAY_TIME);
       }
     }
 
-  WiFiClient client = server.available(); // Check if a client has connected
-  if (!client)
+}
+
+void postData(String unitname, String measurement)
+{
+  HTTPClient http;
+  http.begin(String(URL_WS));
+  http.addHeader("Content-Type", "application/json");
+
+Serial.println("[{'Unitname':'" + unitname + "','Description':'" + String(AREA) + "','Value':'" + measurement + "'}]");
+  int httpCode1 = http.POST("[{'Unitname':'" + unitname + "','Description':'" + String(AREA) + "','Value':'" + measurement + "'}]");
+  String payload1 = http.getString();
+
+  if (DEBUG_MODE)
   {
-    return;
+    Serial.println(httpCode1);
+    Serial.println(payload1);
   }
-  // Prepare the response
-  String s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n <!DOCTYPE html> <html> <head> <title>GPS DATA</title> <style>";
-  s += "a:link {background-color: YELLOW;text-decoration: none;}";
-  s += "table, th, td </style> </head> <body> <h1  style=";
-  s += "font-size:300%;";
-  s += " ALIGN=CENTER> GPS DATA</h1>";
-  s += "<p ALIGN=CENTER style="
-       "font-size:150%;"
-       "";
-  s += "> <b>Location Details</b></p> <table ALIGN=CENTER style=";
-  s += "width:50%";
-  s += "> <tr> <th>Latitude</th>";
-  s += "<td ALIGN=CENTER >";
-  s += lat_str;
-  s += "</td> </tr> <tr> <th>Longitude</th> <td ALIGN=CENTER >";
-  s += lng_str;
-  s += "</td> </tr> <tr>  <th>Date</th> <td ALIGN=CENTER >";
-  s += date_str;
-  s += "</td></tr> <tr> <th>Time</th> <td ALIGN=CENTER >";
-  s += time_str;
-  s += "</td>  </tr> </table> ";
 
-  s += "</body> </html>";
-
-  client.print(s); // all the values are send to the webpage
-  delay(100);
+  http.end();
 }
