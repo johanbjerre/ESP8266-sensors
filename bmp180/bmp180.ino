@@ -9,6 +9,10 @@ const char *UNITNAME = "bmp180";
 const int DELAY_TIME = 300000; //1000*60*5=300000 (5 min)
 #define LED D4
 
+const char *SSID = "";
+const char *PASSWORD = "";
+const char *URL_WS = "";
+
 Adafruit_BMP085 bmp;
 
 void setup()
@@ -71,7 +75,7 @@ void postData(String measurement)
   http.begin(String(URL_WS));
   http.addHeader("Content-Type", "application/json");
 
-  int httpCode1 = http.POST("[{'Unitname':'" + String(UNITNAME) + "','Description':'" + String(AREA) + "','Value':'" + measurement + "'}]");
+  int httpCode1 = http.POST("[{\"Unitname\":\"" + String(UNITNAME) + "\",\"Description\":\"" + String(AREA) + "\",\"Value\":\"" + measurement + "\"}]");
   String payload1 = http.getString();
 
   Serial.println(httpCode1);

@@ -13,13 +13,13 @@
 #define DHTPIN 5
 #define LED D4
 
-const char *AREA = "garage";
+const char *AREA = "laundryroom";
 const char *UNITNAME_DHT22 = "dht22";
 const char *UNITNAME_DS18B20 = "ds18b20";
 const int DELAY_TIME = 300000; //1000*60*5=300000 (5 min)
 const bool SAVE_HUMIDITY = true;
 const bool SAVE_TEMPERATURE = true;
-const bool DEBUG_MODE = false;
+const bool DEBUG_MODE = true;
 
 const char *SSID = "";
 const char *PASSWORD = "";
@@ -143,7 +143,7 @@ void postData(String unitname, String measurement)
   http.begin(String(URL_WS));
   http.addHeader("Content-Type", "application/json");
 
-  int httpCode1 = http.POST("[{'Unitname':'" + unitname + "','Description':'" + String(AREA) + "','Value':'" + measurement + "'}]");
+  int httpCode1 = http.POST("[{\"Unitname\":\"" + unitname + "\",\"Description\":\"" + String(AREA) + "\",\"Value\":\"" + measurement + "\"}]");
   String payload1 = http.getString();
 
   if (DEBUG_MODE)
