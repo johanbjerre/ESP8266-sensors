@@ -5,6 +5,10 @@
 const char *AREA = "livingroom";
 const char *UNITNAME = "pir";
 
+const char *SSID = "";
+const char *PASSWORD = "";
+const char *URL_WS = "";
+
 #define LED D4
 #define SENSOR D7
 
