@@ -3,14 +3,14 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 TinyGPSPlus gps;
-SoftwareSerial ss(4, 5);// The serial connection to the GPS device
+SoftwareSerial ss(4, 5); // The serial connection to the GPS device
 float latitude, longitude;
 int year, month, date, hour, minute, second;
 String date_str, time_str, lat_str, lng_str, coords;
 int pm;
 
 const char *AREA = "car";
-const int DELAY_TIME = 1000*60*5;
+const int DELAY_TIME = 1000 * 60 * 5;
 const bool DEBUG_MODE = true;
 const char *UNITNAME = "gps";
 
@@ -106,14 +106,14 @@ void loop()
       if (gps.location.isValid() && gps.date.isValid() && gps.satellites.isValid() && gps.time.isValid())
       {
         //location
-        Serial.print("lat_str:" + lat_str+", lng_str:" + lng_str);
+        Serial.print("lat_str:" + lat_str + ", lng_str:" + lng_str);
 
-        coords=lng_str + "," +lat_str;
-        postData(String(UNITNAME),lng_str,lat_str);
+        coords = lng_str + "," + lat_str;
+        postData(String(UNITNAME), lng_str, lat_str);
 
         //date
         Serial.print(", date_str:" + date_str);
-        
+
         //location
         Serial.print(", gps.satellites:" + String(gps.satellites.value()));
 
@@ -123,7 +123,6 @@ void loop()
         delay(DELAY_TIME);
       }
     }
-
 }
 
 void postData(String unitname, String longStr, String latStr)
@@ -132,7 +131,7 @@ void postData(String unitname, String longStr, String latStr)
   http.begin(String(URL_WS));
   http.addHeader("Content-Type", "application/json");
 
-Serial.println("[{\"Unitname\":\"" + unitname + "\",\"Description\":\"" + String(AREA) + "\",\"Lat\":\"" + latStr + "\",\"Long\":\"" + longStr + "\"}]");
+  Serial.println("[{\"Unitname\":\"" + unitname + "\",\"Description\":\"" + String(AREA) + "\",\"Lat\":\"" + latStr + "\",\"Long\":\"" + longStr + "\"}]");
   int httpCode1 = http.POST("[{\"Unitname\":\"" + unitname + "\",\"Description\":\"" + String(AREA) + "\",\"Lat\":\"" + latStr + "\",\"Long\":\"" + longStr + "\"}]");
   String payload1 = http.getString();
 
