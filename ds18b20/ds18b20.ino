@@ -6,6 +6,7 @@
 
 const int oneWireBus = 4;
 
+WiFiClient client;
 OneWire oneWire(oneWireBus);
 
 DallasTemperature sensors(&oneWire);
@@ -64,7 +65,7 @@ void loop()
 void postData(String temperature)
 {
   HTTPClient http;
-  http.begin(String(URL_WS));
+  http.begin(client, String(URL_WS));
   http.addHeader("Content-Type", "application/json");
 
   int httpCode1 = http.POST("[{\"Unitname\":\"ds18b20\",\"Description\":\"" + String(AREA) + "\",\"Value\":\"" + temperature + "\"}]");
