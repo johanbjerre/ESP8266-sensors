@@ -53,6 +53,7 @@ void loop() {
   } else {
     Serial.println("readData NO");
   }
+  delay(1000);
 }
 
 void tick() {
