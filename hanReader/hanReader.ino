@@ -19,6 +19,7 @@ long LAST_UPDATE_SENT = millis();
 // Ticker
 Ticker ticker;
 
+
 void setup() {
   Serial.begin(9600);
   pinMode(LED_BUILTIN, OUTPUT);
@@ -32,8 +33,12 @@ void loop() {
   long now = millis();
   Serial.println("loop now:" + String(now) + ", LAST_UPDATE_SENT :" + String(LAST_UPDATE_SENT) + ", UPDATE_INTERVAL:" + String(UPDATE_INTERVAL));
   if (now - LAST_UPDATE_SENT > UPDATE_INTERVAL) {
+    /*
+    test
     postDataAPI(2); //test
-    //readData();
+    LAST_UPDATE_SENT = millis();
+    */
+    readData();
   } else {
     Serial.println("readData NO");
   }
