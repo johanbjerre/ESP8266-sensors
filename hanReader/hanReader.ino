@@ -70,7 +70,7 @@ void readData() {
       processLine(len);
     }
   }
-  delay(1000);
+  //delay(1000);
 }
 
 void processLine(int len) {
