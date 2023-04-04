@@ -360,15 +360,8 @@ void postDataAPI() {
   int httpCode1 = http.POST("[{\"Description\":\"CONSUMPTION\",\"Value\":\"" + String(CONSUMPTION) + "\"}]");
   String payload1 = http.getString();
 
-  //RETURNDELIVERY
-  Serial.println("[{\"Description\":\"RETURNDELIVERY\",\"Value\":\"" + String(RETURNDELIVERY) + "\"}]");
-  int httpCode2 = http.POST("[{\"Description\":\"RETURNDELIVERY\",\"Value\":\"" + String(RETURNDELIVERY) + "\"}]");
-  String payload2 = http.getString();
-  
   Serial.println(httpCode1);
   Serial.println(payload1);
-  Serial.println(httpCode2);
-  Serial.println(payload2);
 
   http.end();
 }
