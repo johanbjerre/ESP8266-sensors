@@ -1,16 +1,13 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <Ticker.h>
+#include "WiFiSettings.h"
 
 // * Include settings
 #include "settings.h"
 
 // * Initiate led blinker library
 Ticker ticker;
-
-const char *SSID = "";
-const char *PASSWORD = "";
-const char *URL_WS_ELECTRICITY = "";
 
 //Wifi
 WiFiClient client;
@@ -345,24 +342,33 @@ void processLine(int len) {
 
     bool result = decode_telegram(len + 1);
     if (result) {
-        postDataAPI(CONSUMPTION);
+        postDataAPI();
         LAST_UPDATE_SENT = millis();
     }
 }
 
-void postDataAPI(long consumption) {
+void postDataAPI() {
   
   //test with only CONSUMPTION
   HTTPClient http;
   http.begin(client, String(URL_WS_ELECTRICITY));
   http.addHeader("Content-Type", "application/json");
   //[{"Description":"CONSUMPTION","Value": "8"}]
-  Serial.println("[{\"Description\":\"CONSUMPTION\",\"Value\":\"" + String(consumption) + "\"}]");
-  int httpCode1 = http.POST("[{\"Description\":\"CONSUMPTION\",\"Value\":\"" + String(consumption) + "\"}]");
+
+  //Consumption
+  Serial.println("[{\"Description\":\"CONSUMPTION\",\"Value\":\"" + String(CONSUMPTION) + "\"}]");
+  int httpCode1 = http.POST("[{\"Description\":\"CONSUMPTION\",\"Value\":\"" + String(CONSUMPTION) + "\"}]");
   String payload1 = http.getString();
 
+  //RETURNDELIVERY
+  Serial.println("[{\"Description\":\"RETURNDELIVERY\",\"Value\":\"" + String(RETURNDELIVERY) + "\"}]");
+  int httpCode2 = http.POST("[{\"Description\":\"RETURNDELIVERY\",\"Value\":\"" + String(RETURNDELIVERY) + "\"}]");
+  String payload2 = http.getString();
+  
   Serial.println(httpCode1);
   Serial.println(payload1);
+  Serial.println(httpCode2);
+  Serial.println(payload2);
 
   http.end();
 }
