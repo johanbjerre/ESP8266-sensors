@@ -349,15 +349,17 @@ void processLine(int len) {
 
 void postDataAPI() {
   
-  //test with only CONSUMPTION
   HTTPClient http;
   http.begin(client, String(URL_WS_ELECTRICITY));
   http.addHeader("Content-Type", "application/json");
-  //[{"Description":"CONSUMPTION","Value": "8"}]
 
-  //Consumption
-  Serial.println("[{\"Description\":\"CONSUMPTION\",\"Value\":\"" + String(CONSUMPTION) + "\"}]");
-  int httpCode1 = http.POST("[{\"Description\":\"CONSUMPTION\",\"Value\":\"" + String(CONSUMPTION) + "\"}]");
+  String jsonData="[{\"Description\":\"CONSUMPTION\",\"Value\":\"" + String(CONSUMPTION) + "\"}"+
+  ",{\"Description\":\"RETURNDELIVERY\",\"Value\":\"" + String(RETURNDELIVERY) + "\"},"+
+  ",{\"Description\":\"ACTUAL_CONSUMPTION\",\"Value\":\"" + String(ACTUAL_CONSUMPTION) + "\"},"+
+  ",{\"Description\":\"ACTUAL_RETURNDELIVERY\",\"Value\":\"" + String(ACTUAL_RETURNDELIVERY) + "\"},"+
+  +"]";
+  Serial.println(jsonData);
+  int httpCode1 = http.POST(jsonData);
   String payload1 = http.getString();
 
   Serial.println(httpCode1);
