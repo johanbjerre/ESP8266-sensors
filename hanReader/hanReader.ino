@@ -354,12 +354,39 @@ void postDataAPI() {
   http.addHeader("Content-Type", "application/json");
 
   String jsonData="[{\"Description\":\"CONSUMPTION\",\"Value\":\"" + String(CONSUMPTION) + "\"}"+
-  ",{\"Description\":\"RETURNDELIVERY\",\"Value\":\"" + String(RETURNDELIVERY) + "\"},"+
-  ",{\"Description\":\"ACTUAL_CONSUMPTION\",\"Value\":\"" + String(ACTUAL_CONSUMPTION) + "\"},"+
-  ",{\"Description\":\"ACTUAL_RETURNDELIVERY\",\"Value\":\"" + String(ACTUAL_RETURNDELIVERY) + "\"},"+
+  ",{\"Description\":\"RETURNDELIVERY\",\"Value\":\"" + String(RETURNDELIVERY) + "\"}"+
+  ",{\"Description\":\"ACTUAL_CONSUMPTION\",\"Value\":\"" + String(ACTUAL_CONSUMPTION) + "\"}"+
+  ",{\"Description\":\"ACTUAL_RETURNDELIVERY\",\"Value\":\"" + String(ACTUAL_RETURNDELIVERY) + "\"}"+
   +"]";
-  Serial.println(jsonData);
-  int httpCode1 = http.POST(jsonData);
+  String allJsonData="[{\"Description\":\"CONSUMPTION\",\"Value\":\"" + String(CONSUMPTION) + "\"},"+
+    "{\"Description\":\"RETURNDELIVERY\",\"Value\":\"" + String(RETURNDELIVERY) + "\"},"+
+    "{\"Description\":\"CONSUMPTION_REACT\",\"Value\":\"" + String(CONSUMPTION_REACT) + "\"},"+
+    "{\"Description\":\"RETURNDELIVERY_REACT\",\"Value\":\"" + String(RETURNDELIVERY_REACT) + "\"},"+
+    "{\"Description\":\"ACTUAL_CONSUMPTION\",\"Value\":\"" + String(ACTUAL_CONSUMPTION) + "\"},"+
+    "{\"Description\":\"ACTUAL_RETURNDELIVERY\",\"Value\":\"" + String(ACTUAL_RETURNDELIVERY) + "\"},"+
+    "{\"Description\":\"ACTUAL_CONSUMPTION_REACT\",\"Value\":\"" + String(ACTUAL_CONSUMPTION_REACT) + "\"},"+
+    "{\"Description\":\"ACTUAL_RETURNDELIVERY_REACT\",\"Value\":\"" + String(ACTUAL_RETURNDELIVERY_REACT) + "\"},"+
+    "{\"Description\":\"L1_INSTANT_POWER_USAGE\",\"Value\":\"" + String(L1_INSTANT_POWER_USAGE) + "\"},"+
+    "{\"Description\":\"L1_INSTANT_POWER_DELIVERY\",\"Value\":\"" + String(L1_INSTANT_POWER_DELIVERY) + "\"},"+
+    "{\"Description\":\"L2_INSTANT_POWER_USAGE\",\"Value\":\"" + String(L2_INSTANT_POWER_USAGE) + "\"},"+
+    "{\"Description\":\"L2_INSTANT_POWER_DELIVERY\",\"Value\":\"" + String(L2_INSTANT_POWER_DELIVERY) + "\"},"+
+    "{\"Description\":\"L3_INSTANT_POWER_USAGE\",\"Value\":\"" + String(L3_INSTANT_POWER_USAGE) + "\"},"+
+    "{\"Description\":\"L3_INSTANT_POWER_DELIVERY\",\"Value\":\"" + String(L3_INSTANT_POWER_DELIVERY) + "\"},"+
+    "{\"Description\":\"L1_REACT_POWER_USAGE\",\"Value\":\"" + String(L1_REACT_POWER_USAGE) + "\"},"+
+    "{\"Description\":\"L1_REACT_POWER_DELIVERY\",\"Value\":\"" + String(L1_REACT_POWER_DELIVERY) + "\"},"+
+    "{\"Description\":\"L2_REACT_POWER_USAGE\",\"Value\":\"" + String(L2_REACT_POWER_USAGE) + "\"},"+
+    "{\"Description\":\"L2_REACT_POWER_DELIVERY\",\"Value\":\"" + String(L2_REACT_POWER_DELIVERY) + "\"},"+
+    "{\"Description\":\"L3_REACT_POWER_USAGE\",\"Value\":\"" + String(L3_REACT_POWER_USAGE) + "\"},"+
+    "{\"Description\":\"L3_REACT_POWER_DELIVERY\",\"Value\":\"" + String(L3_REACT_POWER_DELIVERY) + "\"},"+
+    "{\"Description\":\"L1_INSTANT_POWER_CURRENT\",\"Value\":\"" + String(L1_INSTANT_POWER_CURRENT) + "\"},"+
+    "{\"Description\":\"L2_INSTANT_POWER_CURRENT\",\"Value\":\"" + String(L2_INSTANT_POWER_CURRENT) + "\"},"+
+    "{\"Description\":\"L3_INSTANT_POWER_CURRENT\",\"Value\":\"" + String(L3_INSTANT_POWER_CURRENT) + "\"},"+
+    "{\"Description\":\"L1_VOLTAGE\",\"Value\":\"" + String(L1_VOLTAGE) + "\"},"+
+    "{\"Description\":\"L2_VOLTAGE\",\"Value\":\"" + String(L2_VOLTAGE) + "\"},"+
+    "{\"Description\":\"L3_VOLTAGE\",\"Value\":\"" + String(L3_VOLTAGE) + "\"}"+
+    +"]";
+  Serial.println(allJsonData);
+  int httpCode1 = http.POST(allJsonData);
   String payload1 = http.getString();
 
   Serial.println(httpCode1);
