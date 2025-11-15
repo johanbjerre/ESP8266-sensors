@@ -9,11 +9,12 @@
 #include "DHT.h"
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <WiFiClientSecure.h>
 
 #define DHTPIN 5
 #define LED D4
 
-const char *AREA = "laundryroom";
+const char *AREA = "attic";
 const char *UNITNAME_DHT22 = "dht22";
 const char *UNITNAME_DS18B20 = "ds18b20";
 const int DELAY_TIME = 300000; //1000*60*5=300000 (5 min)
@@ -25,6 +26,7 @@ const char *SSID = "";
 const char *PASSWORD = "";
 const char *URL_WS = "";
 
+WiFiClientSecure client;
 #define DHTTYPE DHT22
 
 DHT dht(DHTPIN, DHTTYPE);
@@ -108,7 +110,7 @@ void saveHumidity()
     Serial.print(m);
   }
 
-  postData(String(UNITNAME_DHT22), String(m));
+  postData(String(UNITNAME_DHT22), String(m, 1));
 }
 
 void saveTemperature()
@@ -126,6 +128,26 @@ void saveTemperature()
     return;
   }
 
+  // Fix for negative temperature readings
+  // Check if the value is suspiciously large negative (sign bit issue)
+  if (m < -200.0 || m > 200.0)
+  {
+    // This indicates incorrect sign bit handling
+    // The DHT22 uses bit 15 as sign, bits 0-14 as magnitude
+    // But it was read as two's complement signed integer
+    int16_t signed_raw = (int16_t)(m * 10);  // Get back to raw signed value
+    uint16_t raw = (uint16_t)(signed_raw + (signed_raw < 0 ? 65536 : 0));  // Convert to unsigned
+    
+    bool isNegative = (raw & 0x8000) != 0;
+    uint16_t magnitude = raw & 0x7FFF;  // Clear sign bit to get magnitude
+    
+    m = (float)magnitude / 10.0;
+    if (isNegative)
+    {
+      m = -m;
+    }
+  }
+
   if (DEBUG_MODE)
   {
     Serial.print(F("%  Temperature: "));
@@ -134,13 +156,14 @@ void saveTemperature()
   }
 
   //TODO fix string
-  postData(String(UNITNAME_DS18B20), String(m));
+  postData(String(UNITNAME_DS18B20), String(m, 1));
 }
 
 void postData(String unitname, String measurement)
 {
+  client.setInsecure();
   HTTPClient http;
-  http.begin(String(URL_WS));
+  http.begin(client, String(URL_WS));
   http.addHeader("Content-Type", "application/json");
 
   int httpCode1 = http.POST("[{\"Unitname\":\"" + unitname + "\",\"Description\":\"" + String(AREA) + "\",\"Value\":\"" + measurement + "\"}]");
