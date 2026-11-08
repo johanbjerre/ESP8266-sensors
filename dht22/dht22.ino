@@ -10,21 +10,24 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
+#include <ArduinoOTA.h>
+#include "../secrets.h"
+#include "../sensor_locations.h"
 
 #define DHTPIN 5
 #define LED D4
 
-const char *AREA = "attic";
+const SensorLocation LOCATION = SensorLocation::Office;
+const char *AREA = locationName(LOCATION);
 const char *UNITNAME_DHT22 = "dht22";
 const char *UNITNAME_DS18B20 = "ds18b20";
-const int DELAY_TIME = 300000; //1000*60*5=300000 (5 min)
+const unsigned long DELAY_TIME = 300000UL; //1000*60*5=300000 (5 min)
 const bool SAVE_HUMIDITY = true;
 const bool SAVE_TEMPERATURE = true;
 const bool DEBUG_MODE = true;
-
-const char *SSID = "";
-const char *PASSWORD = "";
-const char *URL_WS = "";
+unsigned long lastMeasurement = 0;
+bool firstMeasurement = true;
+char otaHostname[32];
 
 WiFiClientSecure client;
 #define DHTTYPE DHT22
@@ -64,29 +67,50 @@ void setup()
     Serial.println("WiFi connected");
   }
 
+  snprintf(otaHostname, sizeof(otaHostname), "esp8266-%s", locationName(LOCATION));
+  ArduinoOTA.setHostname(otaHostname);
+  if (OTA_PASSWORD[0] != '\0')
+  {
+    ArduinoOTA.setPassword(OTA_PASSWORD);
+  }
+  ArduinoOTA.begin();
+
+  if (DEBUG_MODE)
+  {
+    Serial.print("OTA ready at ");
+    Serial.println(WiFi.localIP());
+  }
+
   dht.begin();
 }
 
 void loop()
 {
+  ArduinoOTA.handle();
 
-  //TURN ON LED
-  digitalWrite(LED, LOW);
-
-  if (SAVE_HUMIDITY)
+  if (firstMeasurement || millis() - lastMeasurement >= DELAY_TIME)
   {
-    saveHumidity();
+    lastMeasurement = millis();
+    firstMeasurement = false;
+
+    //TURN ON LED
+    digitalWrite(LED, LOW);
+
+    if (SAVE_HUMIDITY)
+    {
+      saveHumidity();
+    }
+
+    if (SAVE_TEMPERATURE)
+    {
+      saveTemperature();
+    }
+
+    //TURN OFF LED
+    digitalWrite(LED, HIGH);
   }
 
-  if (SAVE_TEMPERATURE)
-  {
-    saveTemperature();
-  }
-
-  //TURN OFF LED
-  digitalWrite(LED, HIGH);
-
-  delay(DELAY_TIME);
+  delay(1);
 }
 
 void saveHumidity()

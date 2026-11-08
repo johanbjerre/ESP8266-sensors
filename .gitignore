@@ -53,3 +53,4 @@ dkms.conf
 
 #auth
 credentials.txt
+/secrets.h
